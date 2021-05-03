@@ -19,6 +19,18 @@ RUN ./lfb/contrib/get_cleveldb.sh $LFB_BUILD_OPTIONS
 RUN ./lfb/contrib/get_rocksdb.sh $LFB_BUILD_OPTIONS
 RUN tar cvzf lib.tar.gz -C /usr/local/lib64 .
 
+# Install rust build tools
+ENV RUSTUP_HOME=/usr/local/rustup
+ENV CARGO_HOME=/usr/local/cargo
+ENV PATH=$CARGO_HOME/bin:$PATH
+
+RUN wget "https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-musl/rustup-init"
+RUN chmod +x rustup-init
+RUN ./rustup-init -y --no-modify-path --default-toolchain 1.50.0
+
+RUN rm rustup-init
+RUN chmod -R a+w $RUSTUP_HOME $CARGO_HOME
+
 # Set WORKDIR to lfb
 WORKDIR /lfb-build/lfb
 
@@ -29,11 +41,16 @@ RUN go env -w GOPRIVATE=github.com/line/*
 RUN git config --global url."https://$GITHUB_TOKEN:x-oauth-basic@github.com/".insteadOf "https://github.com/"
 RUN go mod download
 
+# Build cosmwasm
+RUN cd $(go list -f "{{ .Dir }}" -m github.com/CosmWasm/wasmvm) && \
+    cargo build --release --example muslc && \
+    mv target/release/examples/libmuslc.a /usr/lib/libwasmvm_muslc.a
+
 # Add source files
 COPY . .
 
 # Make install
-RUN make install LFB_BUILD_OPTIONS="$LFB_BUILD_OPTIONS"
+RUN BUILD_TAGS=muslc make install CGO_ENABLED=1 LFB_BUILD_OPTIONS=$LFB_BUILD_OPTIONS
 
 # Final image
 FROM alpine:edge
