@@ -20,7 +20,6 @@ require (
 )
 
 replace (
-	github.com/CosmWasm/wasmvm => github.com/line/wasmvm v0.14.0-0.4.0
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
 )
