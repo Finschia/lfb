@@ -43,8 +43,9 @@ RUN go mod download
 
 # Build cosmwasm
 RUN cd $(go list -f "{{ .Dir }}" -m github.com/line/wasmvm) && \
-    cargo build --release --example muslc && \
-    mv target/release/examples/libmuslc.a /usr/lib/libwasmvm_muslc.a
+    RUSTFLAGS='-C target-feature=-crt-static' cargo build --release --example muslc && \
+    mv target/release/examples/libmuslc.a /usr/lib/libwasmvm_muslc.a && \
+    rm -rf target
 
 # Add source files
 COPY . .
