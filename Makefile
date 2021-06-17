@@ -64,6 +64,9 @@ else
     CGO_ENABLED=1
     BUILD_TAGS += gcc rocksdb
     DB_BACKEND = rocksdb
+    ROCKSDB_DIR=$(shell pwd)/rocksdb
+    CGO_CFLAGS=-I$(ROCKSDB_DIR)/include
+    CGO_LDFLAGS="-L$(ROCKSDB_DIR) -lrocksdb -lm -lstdc++ $(shell awk '/PLATFORM_LDFLAGS/ {sub("PLATFORM_LDFLAGS=", ""); print}' < $(ROCKSDB_DIR)/make_config.mk)"
   endif
   ifeq (boltdb,$(findstring boltdb,$(LFB_BUILD_OPTIONS)))
     BUILD_TAGS += boltdb
@@ -122,14 +125,23 @@ all: install lint test
 
 build: BUILD_ARGS=-o $(BUILDDIR)/
 
-build: go.sum $(BUILDDIR)/
-	CGO_ENABLED=$(CGO_ENABLED) go build -mod=readonly $(BUILD_FLAGS) $(BUILD_ARGS) ./...
+build: go.sum $(BUILDDIR)/ rocksdb
+	CGO_CFLAGS=$(CGO_CFLAGS) CGO_LDFLAGS=$(CGO_LDFLAGS) CGO_ENABLED=$(CGO_ENABLED) go build -mod=readonly $(BUILD_FLAGS) $(BUILD_ARGS) ./...
 
-install: go.sum $(BUILDDIR)/
-	CGO_ENABLED=$(CGO_ENABLED) go install $(BUILD_FLAGS) $(BUILD_ARGS) ./cmd/lfb
+install: go.sum $(BUILDDIR)/ rocksdb
+	CGO_CFLAGS=$(CGO_CFLAGS) CGO_LDFLAGS=$(CGO_LDFLAGS) CGO_ENABLED=$(CGO_ENABLED) go install $(BUILD_FLAGS) $(BUILD_ARGS) ./cmd/lfb
 
 $(BUILDDIR)/:
 	mkdir -p $(BUILDDIR)/
+
+.PHONY: rocksdb
+ifneq ($(DB_BACKEND), rocksdb)
+rocksdb:
+else
+rocksdb:
+	@[ ! -e rocksdb/.git ] && git submodule update --init rocksdb;	\
+		cd rocksdb && make -j8 static_lib;
+endif
 
 build-reproducible: go.sum
 	$(DOCKER) rm latest-build || true
@@ -167,6 +179,11 @@ draw-deps:
 
 clean:
 	rm -rf $(BUILDDIR)/ artifacts/
+	@ROCKSDB_DIR=rocksdb;				\
+	if [ -e $${ROCKSDB_DIR}/Makefile ]; then	\
+		cd $${ROCKSDB_DIR};			\
+		make clean;				\
+	fi
 
 distclean: clean
 	rm -rf vendor/
