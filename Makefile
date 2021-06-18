@@ -139,8 +139,12 @@ ifneq ($(DB_BACKEND), rocksdb)
 rocksdb:
 else
 rocksdb:
-	@[ ! -e rocksdb/.git ] && git submodule update --init rocksdb;	\
-		cd rocksdb && make -j8 static_lib;
+	@if [ ! -e rocksdb ]; then                 \
+		sh contrib/get_rocksdb.sh;         \
+	fi
+	@if [ ! -e rocksdb/librocksdb.a ]; then    \
+		cd rocksdb && make -j8 static_lib; \
+	fi
 endif
 
 build-reproducible: go.sum
