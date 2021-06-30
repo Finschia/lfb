@@ -2,7 +2,7 @@
 # > docker build -t line/lfb .
 # > docker run -it -p 26656:26656 -p 26657:26657 -v ~/.lfb:/root/.lfb -v line/lfb lfb init
 # > docker run -it -p 26656:26656 -p 26657:26657 -v ~/.lfb:/root/.lfb -v line/lfb lfb start --rpc.laddr=tcp://0.0.0.0:26657 --p2p.laddr=tcp://0.0.0.0:26656
-FROM golang:1.15-alpine AS build-env
+FROM golang:1.15-alpine3.13 AS build-env
 ARG GITHUB_TOKEN=""
 ARG LFB_BUILD_OPTIONS=""
 
