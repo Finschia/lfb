@@ -10,7 +10,7 @@ go test -mod=readonly -v -p 4 `go list ./cli_test/...` -tags=cli_test
 
 ### Test Structure
 
-This integration suite [uses a thin wrapper](https://https://github.com/line/lfb-sdk/tree/main/tests) over the [`os/exec`](https://golang.org/pkg/os/exec/) package. This allows the integration test to run against built binary (`lfb` is used) while being written in golang. This allows tests to take advantage of the various golang code we have for operations like marshal/unmarshal, crypto, etc...
+This integration suite [uses a thin wrapper](https://github.com/line/lfb-sdk/tree/main/tests) over the [`os/exec`](https://golang.org/pkg/os/exec/) package. This allows the integration test to run against built binary (`lfb` is used) while being written in golang. This allows tests to take advantage of the various golang code we have for operations like marshal/unmarshal, crypto, etc...
 
 > NOTE: The tests will use whatever `lfb` binary is available in your `$PATH`. You can check which binary will be run by the suite by running `which lfb`. If you have your `$GOPATH` properly setup they should be in `$GOPATH/bin/lfb`. This will ensure that your test uses the latest binary you have built
 
