@@ -95,7 +95,3 @@ To test any changes made in the SDK or Ostracon, a `replace` clause needs to be 
 - Add `replace github.com/line/lfb-sdk => /path/to/clone/lfb-sdk` to `go.mod`
 - Run `make clean install` or `make clean build`
 - Test changes
-
-## Next
-
-Now you can [join the mainnet](./join-mainnet.md), [the public testnet](./join-testnet.md) or [create you own testnet](./deploy-testnet.md)
