@@ -123,10 +123,10 @@ all: install lint test
 build: BUILD_ARGS=-o $(BUILDDIR)/
 
 build: go.sum $(BUILDDIR)/
-	CGO_ENABLED=$(CGO_ENABLED) go build -mod=readonly $(BUILD_FLAGS) $(BUILD_ARGS) ./...
+	CGO_ENABLED=1 go build -mod=readonly $(BUILD_FLAGS) $(BUILD_ARGS) ./...
 
 install: go.sum $(BUILDDIR)/
-	CGO_ENABLED=$(CGO_ENABLED) go install $(BUILD_FLAGS) $(BUILD_ARGS) ./cmd/lfb
+	CGO_ENABLED=1 go install $(BUILD_FLAGS) $(BUILD_ARGS) ./cmd/lfb
 
 $(BUILDDIR)/:
 	mkdir -p $(BUILDDIR)/
