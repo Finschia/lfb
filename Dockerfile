@@ -12,11 +12,19 @@ RUN apk add --update --no-cache $PACKAGES
 # Set WORKDIR to lfb
 WORKDIR /lfb-build/lfb
 
-# Add source files
-COPY . .
+# prepare dbbackend before building; this can be cached
+COPY ./Makefile ./
+COPY ./contrib ./contrib
+COPY ./sims.mk ./
+RUN make dbbackend LFB_BUILD_OPTIONS="$LFB_BUILD_OPTIONS"
 
 # Install GO dependencies
+COPY ./go.mod /lfb-build/lfb/go.mod
+COPY ./go.sum /lfb-build/lfb/go.sum
 RUN go mod download
+
+# Add source files
+COPY . .
 
 # Make install
 RUN make install LFB_BUILD_OPTIONS="$LFB_BUILD_OPTIONS"
