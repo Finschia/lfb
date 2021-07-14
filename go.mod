@@ -6,10 +6,9 @@ require (
 	github.com/dgraph-io/ristretto v0.0.3 // indirect
 	github.com/dgryski/go-farm v0.0.0-20200201041132-a6ae2369ad13 // indirect
 	github.com/gorilla/mux v1.8.0
-	github.com/line/lfb-sdk v1.0.0-init.1.0.20210624050312-9bcea92166c3
+	github.com/line/lfb-sdk v1.0.0-init.1.0.20210714065441-c1c71f11af03
 	github.com/line/ostracon v0.34.9-0.20210610071151-a52812ac9add
 	github.com/line/tm-db/v2 v2.0.0-init.1.0.20210413083915-5bb60e117524
-	github.com/pkg/errors v0.9.1
 	github.com/rakyll/statik v0.1.7
 	github.com/spf13/cast v1.3.1
 	github.com/spf13/cobra v1.1.3
