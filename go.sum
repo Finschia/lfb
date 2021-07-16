@@ -412,8 +412,8 @@ github.com/line/gorocksdb v0.0.0-20210406043732-d4bea34b6d55 h1:cXVtMiJkvQ4kn0px
 github.com/line/gorocksdb v0.0.0-20210406043732-d4bea34b6d55/go.mod h1:DHRJroSL7NaRkpvocRx3OtRsleXVsYSxBI9SfHFlTQ0=
 github.com/line/iavl/v2 v2.0.0-init.1.0.20210602045707-fddfe1f85001 h1:c2URk0zxM1vRgaRfIFoWkLzvj17nl/To9Q3NUVwY4+g=
 github.com/line/iavl/v2 v2.0.0-init.1.0.20210602045707-fddfe1f85001/go.mod h1:0Xz+0i1nlB9lrjUDEwpDRhcmjfEAkOjd20dRb40FBso=
-github.com/line/lfb-sdk v1.0.0-init.1.0.20210714065441-c1c71f11af03 h1:64o9L8vTBW9ojTCaiZ60GClFHdwnjSPHzVgZehRaVko=
-github.com/line/lfb-sdk v1.0.0-init.1.0.20210714065441-c1c71f11af03/go.mod h1:fgSvNQZT6/ye88z+uNem3JQRDjW1so1KqK2dP9a81Dw=
+github.com/line/lfb-sdk v1.0.0-init.1.0.20210716030316-af78aa4c1c22 h1:ozCdOxNDWAMVJ9RhwXWMxRcObsYIDl3c/nHIO1Zsw2k=
+github.com/line/lfb-sdk v1.0.0-init.1.0.20210716030316-af78aa4c1c22/go.mod h1:fgSvNQZT6/ye88z+uNem3JQRDjW1so1KqK2dP9a81Dw=
 github.com/line/ostracon v0.34.9-0.20210429084710-ef4fe0a40c7d/go.mod h1:ttnbq+yQJMQ9a2MT5SEisOoa/+pOgh2KenTiK/rVdiw=
 github.com/line/ostracon v0.34.9-0.20210610071151-a52812ac9add h1:WVSJIT1mDMMhBt0D1bBY6H5k25iSg3eUKX5YA8RDJHo=
 github.com/line/ostracon v0.34.9-0.20210610071151-a52812ac9add/go.mod h1:ttnbq+yQJMQ9a2MT5SEisOoa/+pOgh2KenTiK/rVdiw=
