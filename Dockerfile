@@ -51,7 +51,7 @@ RUN cd $(go list -f "{{ .Dir }}" -m github.com/line/wasmvm) && \
 COPY . .
 
 # Make install
-RUN BUILD_TAGS=muslc make install CGO_ENABLED=1 LFB_BUILD_OPTIONS=$LFB_BUILD_OPTIONS
+RUN BUILD_TAGS=muslc make install CGO_ENABLED=1 LFB_BUILD_OPTIONS="$LFB_BUILD_OPTIONS"
 
 # Final image
 FROM alpine:edge
