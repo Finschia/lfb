@@ -58,7 +58,7 @@ func (app *LinkApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs [
 	allowedAddrsMap := make(map[string]bool)
 
 	for _, addr := range jailAllowedAddrs {
-		_, err := sdk.ValAddressFromBech32(addr)
+		err := sdk.ValidateValAddress(addr)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -79,16 +79,17 @@ func (app *LinkApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs [
 	// withdraw all delegator rewards
 	dels := app.StakingKeeper.GetAllDelegations(ctx)
 	for _, delegation := range dels {
-		valAddr, err := sdk.ValAddressFromBech32(delegation.ValidatorAddress)
+		err := sdk.ValidateValAddress(delegation.ValidatorAddress)
 		if err != nil {
 			panic(err)
 		}
 
-		delAddr, err := sdk.AccAddressFromBech32(delegation.DelegatorAddress)
+		err = sdk.ValidateAccAddress(delegation.DelegatorAddress)
 		if err != nil {
 			panic(err)
 		}
-		_, _ = app.DistrKeeper.WithdrawDelegationRewards(ctx, delAddr, valAddr) // nolint: errcheck
+		_, _ = app.DistrKeeper.WithdrawDelegationRewards(ctx, sdk.AccAddress(delegation.DelegatorAddress),
+			sdk.ValAddress(delegation.ValidatorAddress)) // nolint: errcheck
 	}
 
 	// clear validator slash events
@@ -115,16 +116,18 @@ func (app *LinkApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs [
 
 	// reinitialize all delegations
 	for _, del := range dels {
-		valAddr, err := sdk.ValAddressFromBech32(del.ValidatorAddress)
+		err := sdk.ValidateValAddress(del.ValidatorAddress)
 		if err != nil {
 			panic(err)
 		}
-		delAddr, err := sdk.AccAddressFromBech32(del.DelegatorAddress)
+		err = sdk.ValidateAccAddress(del.DelegatorAddress)
 		if err != nil {
 			panic(err)
 		}
-		app.DistrKeeper.Hooks().BeforeDelegationCreated(ctx, delAddr, valAddr)
-		app.DistrKeeper.Hooks().AfterDelegationModified(ctx, delAddr, valAddr)
+		app.DistrKeeper.Hooks().BeforeDelegationCreated(ctx, sdk.AccAddress(del.DelegatorAddress),
+			sdk.ValAddress(del.ValidatorAddress))
+		app.DistrKeeper.Hooks().AfterDelegationModified(ctx, sdk.AccAddress(del.DelegatorAddress),
+			sdk.ValAddress(del.ValidatorAddress))
 	}
 
 	// reset context height
