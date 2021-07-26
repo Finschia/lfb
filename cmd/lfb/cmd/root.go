@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -222,14 +223,18 @@ func createSimappAndExport(
 	encCfg := app.MakeEncodingConfig() // Ideally, we would reuse the one created by NewRootCmd.
 	encCfg.Marshaler = codec.NewProtoCodec(encCfg.InterfaceRegistry)
 	var linkApp *app.LinkApp
+	homePath, ok := appOpts.Get(flags.FlagHome).(string)
+	if !ok || homePath == "" {
+		return servertypes.ExportedApp{}, errors.New("application home not set")
+	}
 	if height != -1 {
-		linkApp = app.NewLinkApp(logger, db, traceStore, false, map[int64]bool{}, "", cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)), encCfg, appOpts)
+		linkApp = app.NewLinkApp(logger, db, traceStore, false, map[int64]bool{}, homePath, cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)), encCfg, appOpts)
 
 		if err := linkApp.LoadHeight(height); err != nil {
 			return servertypes.ExportedApp{}, err
 		}
 	} else {
-		linkApp = app.NewLinkApp(logger, db, traceStore, true, map[int64]bool{}, "", cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)), encCfg, appOpts)
+		linkApp = app.NewLinkApp(logger, db, traceStore, true, map[int64]bool{}, homePath, cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)), encCfg, appOpts)
 	}
 
 	return linkApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)
