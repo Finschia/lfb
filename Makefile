@@ -16,7 +16,7 @@ OST_VERSION := $(shell go list -m github.com/line/ostracon | sed 's:.* ::') # gr
 DOCKER := $(shell which docker)
 BUILDDIR ?= $(CURDIR)/build
 TEST_DOCKER_REPO=jackzampolin/linktest
-CGO_ENABLED ?= 0
+CGO_ENABLED ?= 1
 
 export GO111MODULE = on
 
