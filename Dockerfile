@@ -23,11 +23,17 @@ COPY ./go.mod /lfb-build/lfb/go.mod
 COPY ./go.sum /lfb-build/lfb/go.sum
 RUN go mod download
 
+# Build cosmwasm
+RUN cd $(go list -f "{{ .Dir }}" -m github.com/line/wasmvm) && \
+    RUSTFLAGS='-C target-feature=-crt-static' cargo build --release --example muslc && \
+    mv target/release/examples/libmuslc.a /usr/lib/libwasmvm_muslc.a && \
+    rm -rf target
+
 # Add source files
 COPY . .
 
 # Make install
-RUN make install LFB_BUILD_OPTIONS="$LFB_BUILD_OPTIONS"
+RUN BUILD_TAGS=muslc make install CGO_ENABLED=1 LFB_BUILD_OPTIONS="$LFB_BUILD_OPTIONS"
 
 # Final image
 FROM alpine:edge
