@@ -203,7 +203,7 @@ func init() {
 // NewLinkApp returns a reference to an initialized Link.
 func NewLinkApp(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool, skipUpgradeHeights map[int64]bool,
-	homePath string, invCheckPeriod uint, encodingConfig appparams.EncodingConfig, appOpts servertypes.AppOptions, baseAppOptions ...func(*baseapp.BaseApp),
+	homePath string, invCheckPeriod uint, encodingConfig appparams.EncodingConfig, appOpts servertypes.AppOptions, wasmOpts []wasm.Option, baseAppOptions ...func(*baseapp.BaseApp),
 ) *LinkApp {
 	appCodec := encodingConfig.Marshaler
 	legacyAmino := encodingConfig.Amino
@@ -330,6 +330,7 @@ func NewLinkApp(
 		supportedFeatures,
 		nil,
 		nil,
+		wasmOpts...,
 	)
 
 	// register the proposal types
