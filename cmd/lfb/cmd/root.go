@@ -26,14 +26,17 @@ import (
 	banktypes "github.com/line/lfb-sdk/x/bank/types"
 	"github.com/line/lfb-sdk/x/crisis"
 	genutilcli "github.com/line/lfb-sdk/x/genutil/client/cli"
+	"github.com/line/lfb-sdk/x/wasm"
 	lfbtypes "github.com/line/lfb/types"
 	ostcli "github.com/line/ostracon/libs/cli"
 	"github.com/line/ostracon/libs/log"
 	dbm "github.com/line/tm-db/v2"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
+	wasmkeeper "github.com/line/lfb-sdk/x/wasm/keeper"
 	"github.com/line/lfb/app"
 	"github.com/line/lfb/app/params"
 )
@@ -195,6 +198,10 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts serverty
 	if err != nil {
 		panic(err)
 	}
+	var wasmOpts []wasm.Option
+	if cast.ToBool(appOpts.Get("telemetry.enabled")) {
+		wasmOpts = append(wasmOpts, wasmkeeper.WithVMCacheMetrics(prometheus.DefaultRegisterer))
+	}
 
 	return app.NewLinkApp(
 		logger, db, traceStore, true, skipUpgradeHeights,
@@ -202,6 +209,7 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts serverty
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
 		app.MakeEncodingConfig(), // Ideally, we would reuse the one created by NewRootCmd.
 		appOpts,
+		wasmOpts,
 		baseapp.SetPruning(pruningOpts),
 		baseapp.SetMinGasPrices(cast.ToString(appOpts.Get(server.FlagMinGasPrices))),
 		baseapp.SetHaltHeight(cast.ToUint64(appOpts.Get(server.FlagHaltHeight))),
@@ -228,13 +236,13 @@ func createSimappAndExport(
 		return servertypes.ExportedApp{}, errors.New("application home not set")
 	}
 	if height != -1 {
-		linkApp = app.NewLinkApp(logger, db, traceStore, false, map[int64]bool{}, homePath, cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)), encCfg, appOpts)
+		linkApp = app.NewLinkApp(logger, db, traceStore, false, map[int64]bool{}, homePath, cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)), encCfg, appOpts, nil)
 
 		if err := linkApp.LoadHeight(height); err != nil {
 			return servertypes.ExportedApp{}, err
 		}
 	} else {
-		linkApp = app.NewLinkApp(logger, db, traceStore, true, map[int64]bool{}, homePath, cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)), encCfg, appOpts)
+		linkApp = app.NewLinkApp(logger, db, traceStore, true, map[int64]bool{}, homePath, cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)), encCfg, appOpts, nil)
 	}
 
 	return linkApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)

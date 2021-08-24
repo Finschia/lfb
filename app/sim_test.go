@@ -42,7 +42,7 @@ func BenchmarkFullAppSimulation(b *testing.B) {
 		}
 	}()
 
-	app := link.NewLinkApp(logger, db, nil, true, map[int64]bool{}, link.DefaultNodeHome, simapp.FlagPeriodValue, link.MakeEncodingConfig(), simapp.EmptyAppOptions{}, interBlockCacheOpt())
+	app := link.NewLinkApp(logger, db, nil, true, map[int64]bool{}, link.DefaultNodeHome, simapp.FlagPeriodValue, link.MakeEncodingConfig(), simapp.EmptyAppOptions{}, nil, interBlockCacheOpt())
 
 	// Run randomized simulation:w
 	_, simParams, simErr := simulation.SimulateFromSeed(
@@ -108,7 +108,7 @@ func TestAppStateDeterminism(t *testing.T) {
 			}
 
 			db := memdb.NewDB()
-			app := link.NewLinkApp(logger, db, nil, true, map[int64]bool{}, link.DefaultNodeHome, simapp.FlagPeriodValue, link.MakeEncodingConfig(), simapp.EmptyAppOptions{}, interBlockCacheOpt())
+			app := link.NewLinkApp(logger, db, nil, true, map[int64]bool{}, link.DefaultNodeHome, simapp.FlagPeriodValue, link.MakeEncodingConfig(), simapp.EmptyAppOptions{}, nil, interBlockCacheOpt())
 
 			fmt.Printf(
 				"running non-determinism simulation; seed %d: %d/%d, attempt: %d/%d\n",

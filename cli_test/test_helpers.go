@@ -1342,6 +1342,7 @@ func newTestnetConfig(t *testing.T, genesisState map[string]json.RawMessage, cha
 		return app.NewLinkApp(val.Ctx.Logger, db, nil, true, make(map[int64]bool), val.Dir, 0,
 			encodingCfg,
 			val.Ctx.Viper,
+			nil,
 			baseapp.SetPruning(storetypes.NewPruningOptionsFromString(storetypes.PruningOptionNothing)),
 			baseapp.SetMinGasPrices(minGasPrices),
 		)
