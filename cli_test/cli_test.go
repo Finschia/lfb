@@ -4,19 +4,17 @@ package clitest
 
 import (
 	"encoding/base64"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"testing"
 	"time"
-
-	"github.com/stretchr/testify/require"
-
-	"github.com/line/lfb/app"
 
 	"github.com/line/lfb-sdk/client/flags"
 	"github.com/line/lfb-sdk/crypto/keys/ed25519"
@@ -24,8 +22,9 @@ import (
 	"github.com/line/lfb-sdk/types/tx"
 	gov "github.com/line/lfb-sdk/x/gov/types"
 	minttypes "github.com/line/lfb-sdk/x/mint/types"
-
+	"github.com/line/lfb/app"
 	osttypes "github.com/line/ostracon/types"
+	"github.com/stretchr/testify/require"
 )
 
 func TestLFBKeysAddMultisig(t *testing.T) {
@@ -1210,4 +1209,136 @@ func TestLFBIncrementSequenceDecorator(t *testing.T) {
 	for _, txHash := range txHashes {
 		require.Equal(t, height, f.QueryTx(txHash).Height)
 	}
+}
+
+func TestLFBWasmContract(t *testing.T) {
+	t.Parallel()
+	f := InitFixtures(t)
+	defer f.Cleanup()
+
+	// start lfb server with minimum fees
+	n := f.LFBStart("")
+	defer n.Cleanup()
+
+	fooAddr := f.KeyAddress(keyFoo)
+
+	flagFromFoo := fmt.Sprintf("--from=%s", fooAddr)
+	flagGas := "--gas=auto"
+	flagGasAdjustment := "--gas-adjustment=1.2"
+	workDir, _ := os.Getwd()
+	tmpDir := path.Join(workDir, "tmp-dir-for-test-queue")
+	dirContract := path.Join(workDir, "contracts", "queue")
+	hashFile := path.Join(dirContract, "hash.txt")
+	wasmQueue := path.Join(dirContract, "contract.wasm")
+	codeID := uint64(1)
+	amountSend := uint64(10)
+	denomSend := fooDenom
+
+	var contractAddress string
+	count := 0
+	initValue := 0
+	enqueueValue := 2
+
+	// make tmpDir
+	os.Mkdir(tmpDir, os.ModePerm)
+
+	// validate that there are no code in the chain
+	{
+		listCode := f.QueryListCodeWasm()
+		require.Len(t, listCode.CodeInfos, 0)
+	}
+
+	// store the contract queue
+	{
+		_, err := f.TxStoreWasm(wasmQueue, flagFromFoo, flagGasAdjustment, flagGas, "-y")
+		require.NoError(t, err)
+		// Wait for a new block
+		err = n.WaitForNextBlock()
+		require.NoError(t, err)
+	}
+
+	// validate the code is stored
+	{
+		queryCodesResponse := f.QueryListCodeWasm()
+		require.Len(t, queryCodesResponse.CodeInfos, 1)
+
+		//validate the hash is the same
+		expectedRow, _ := ioutil.ReadFile(hashFile)
+		expected, err := hex.DecodeString(string(expectedRow[:64]))
+		require.NoError(t, err)
+		actual := queryCodesResponse.CodeInfos[0].DataHash.Bytes()
+		require.Equal(t, expected, actual)
+	}
+
+	// validate getCode get the exact same wasm
+	{
+		outputPath := path.Join(tmpDir, "queue-tmp.wasm")
+		f.QueryCodeWasm(codeID, outputPath)
+		fLocal, _ := os.Open(wasmQueue)
+		fChain, _ := os.Open(outputPath)
+
+		// 2000000 is enough length
+		dataLocal := make([]byte, 2000000)
+		dataChain := make([]byte, 2000000)
+		fLocal.Read(dataLocal)
+		fChain.Read(dataChain)
+		require.Equal(t, dataLocal, dataChain)
+	}
+
+	// validate that there are no contract using the code (id=1)
+	{
+		listContract := f.QueryListContractByCodeWasm(codeID)
+		require.Len(t, listContract.Contracts, 0)
+	}
+
+	// instantiate a contract with the code queue
+	{
+		msgJSON := fmt.Sprintf("{}")
+		flagLabel := "--label=queue-test"
+		flagAmount := fmt.Sprintf("--amount=%d%s", amountSend, denomSend)
+		_, err := f.TxInstantiateWasm(codeID, msgJSON, flagFromFoo, flagGasAdjustment, flagGas, flagLabel, flagAmount, flagFromFoo, "-y")
+		require.NoError(t, err)
+		// Wait for a new block
+		err = n.WaitForNextBlock()
+		require.NoError(t, err)
+	}
+
+	// validate there is only one contract using codeID=1 and get contractAddress
+	{
+		listContract := f.QueryListContractByCodeWasm(codeID)
+		require.Len(t, listContract.Contracts, 1)
+		contractAddress = listContract.Contracts[0]
+	}
+
+	// check queue count and sum
+	{
+		res := f.QueryContractStateSmartWasm(contractAddress, "{\"count\":{}}")
+		require.Equal(t, fmt.Sprintf("{\"data\":{\"count\":%d}}", count), strings.TrimRight(res, "\n"))
+
+		res = f.QueryContractStateSmartWasm(contractAddress, "{\"sum\":{}}")
+		require.Equal(t, fmt.Sprintf("{\"data\":{\"sum\":%d}}", initValue), strings.TrimRight(res, "\n"))
+	}
+
+	// execute contract(enqueue function)
+	{
+		msgJSON := fmt.Sprintf("{\"enqueue\":{\"value\":%d}}", enqueueValue)
+		_, err := f.TxExecuteWasm(contractAddress, msgJSON, flagFromFoo, flagGasAdjustment, flagGas, "-y")
+		require.NoError(t, err)
+		// Wait for a new block
+		err = n.WaitForNextBlock()
+		require.NoError(t, err)
+		count++
+	}
+
+	// check queue count and sum
+	{
+		res := f.QueryContractStateSmartWasm(contractAddress, "{\"count\":{}}")
+		require.Equal(t, fmt.Sprintf("{\"data\":{\"count\":%d}}", count), strings.TrimRight(res, "\n"))
+
+		res = f.QueryContractStateSmartWasm(contractAddress, "{\"sum\":{}}")
+		require.Equal(t, fmt.Sprintf("{\"data\":{\"sum\":%d}}", initValue+enqueueValue), strings.TrimRight(res, "\n"))
+	}
+
+	// remove tmp dir
+	os.RemoveAll(tmpDir)
 }
