@@ -54,7 +54,9 @@ import (
 	slashing "github.com/line/lfb-sdk/x/slashing/types"
 	stakingcli "github.com/line/lfb-sdk/x/staking/client/cli"
 	staking "github.com/line/lfb-sdk/x/staking/types"
+	wasmcli "github.com/line/lfb-sdk/x/wasm/client/cli"
 
+	wasmtypes "github.com/line/lfb-sdk/x/wasm/types"
 	ostcfg "github.com/line/ostracon/config"
 	ostflags "github.com/line/ostracon/libs/cli/flags"
 	"github.com/line/ostracon/libs/log"
@@ -1416,4 +1418,63 @@ func newValidator(f *Fixtures, cfg testnet.Config, appCfg *srvconfig.Config, ctx
 		NodeID:     id,
 		PubKey:     pubKey,
 	}
+}
+
+func (f *Fixtures) TxStoreWasm(wasmFilePath string, flags ...string) (testutil.BufferWriter, error) {
+	cmd := wasmcli.StoreCodeCmd()
+	return testcli.ExecTestCLICmd(getCliCtx(f), cmd, addFlags(wasmFilePath, flags...))
+}
+
+func (f *Fixtures) TxInstantiateWasm(codeID uint64, msgJSON string, flags ...string) (testutil.BufferWriter, error) {
+	args := fmt.Sprintf("%d %s", codeID, msgJSON)
+	cmd := wasmcli.InstantiateContractCmd()
+	return testcli.ExecTestCLICmd(getCliCtx(f), cmd, addFlags(args, flags...))
+}
+
+func (f *Fixtures) TxExecuteWasm(contractAddress string, msgJSON string, flags ...string) (testutil.BufferWriter, error) {
+	args := fmt.Sprintf("%s %s", contractAddress, msgJSON)
+	cmd := wasmcli.ExecuteContractCmd()
+	return testcli.ExecTestCLICmd(getCliCtx(f), cmd, addFlags(args, flags...))
+}
+
+func (f *Fixtures) QueryListCodeWasm(flags ...string) wasmtypes.QueryCodesResponse {
+	cmd := wasmcli.GetCmdListCode()
+	res, errStr := testcli.ExecTestCLICmd(getCliCtx(f), cmd, addFlags("-o=json", flags...))
+
+	require.Empty(f.T, errStr)
+	cdc, _ := app.MakeCodecs()
+	var queryCodesResponse wasmtypes.QueryCodesResponse
+
+	err := cdc.UnmarshalJSON(res.Bytes(), &queryCodesResponse)
+	require.NoError(f.T, err)
+	return queryCodesResponse
+}
+
+func (f *Fixtures) QueryCodeWasm(codeID uint64, outputPath string, flags ...string) {
+	args := fmt.Sprintf("%d %s -o=json", codeID, outputPath)
+	cmd := wasmcli.GetCmdQueryCode()
+	_, errStr := testcli.ExecTestCLICmd(getCliCtx(f), cmd, addFlags(args, flags...))
+	require.Empty(f.T, errStr)
+}
+
+func (f *Fixtures) QueryListContractByCodeWasm(codeID uint64, flags ...string) wasmtypes.QueryContractsByCodeResponse {
+	args := fmt.Sprintf("%d -o=json", codeID)
+	cmd := wasmcli.GetCmdListContractByCode()
+	res, errStr := testcli.ExecTestCLICmd(getCliCtx(f), cmd, addFlags(args, flags...))
+
+	require.Empty(f.T, errStr)
+	cdc, _ := app.MakeCodecs()
+	var queryContractsByCodeResponse wasmtypes.QueryContractsByCodeResponse
+
+	err := cdc.UnmarshalJSON(res.Bytes(), &queryContractsByCodeResponse)
+	require.NoError(f.T, err)
+	return queryContractsByCodeResponse
+}
+
+func (f *Fixtures) QueryContractStateSmartWasm(contractAddress string, reqJSON string, flags ...string) string {
+	args := fmt.Sprintf("%s %s -o=json", contractAddress, reqJSON)
+	cmd := wasmcli.GetCmdGetContractStateSmart()
+	res, errStr := testcli.ExecTestCLICmd(getCliCtx(f), cmd, addFlags(args, flags...))
+	require.Empty(f.T, errStr)
+	return res.String()
 }
