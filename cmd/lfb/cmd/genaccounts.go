@@ -48,7 +48,8 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 
 			config.SetRoot(clientCtx.HomeDir)
 
-			addr, err := sdk.AccAddressFromBech32(args[0])
+			var addr sdk.AccAddress
+			err := sdk.ValidateAccAddress(args[0])
 			if err != nil {
 				inBuf := bufio.NewReader(cmd.InOrStdin())
 				keyringBackend, err := cmd.Flags().GetString(flags.FlagKeyringBackend)
@@ -68,6 +69,8 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 				}
 
 				addr = info.GetAddress()
+			} else {
+				addr = sdk.AccAddress(args[0])
 			}
 
 			coins, err := sdk.ParseCoinsNormalized(args[1])

@@ -58,7 +58,7 @@ func (app *LinkApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs [
 	allowedAddrsMap := make(map[string]bool)
 
 	for _, addr := range jailAllowedAddrs {
-		_, err := sdk.ValAddressFromBech32(addr)
+		err := sdk.ValidateValAddress(addr)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -79,15 +79,16 @@ func (app *LinkApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs [
 	// withdraw all delegator rewards
 	dels := app.StakingKeeper.GetAllDelegations(ctx)
 	for _, delegation := range dels {
-		valAddr, err := sdk.ValAddressFromBech32(delegation.ValidatorAddress)
+		err := sdk.ValidateValAddress(delegation.ValidatorAddress)
 		if err != nil {
 			panic(err)
 		}
-
-		delAddr, err := sdk.AccAddressFromBech32(delegation.DelegatorAddress)
+		valAddr := sdk.ValAddress(delegation.ValidatorAddress)
+		err = sdk.ValidateAccAddress(delegation.DelegatorAddress)
 		if err != nil {
 			panic(err)
 		}
+		delAddr := sdk.AccAddress(delegation.DelegatorAddress)
 		_, _ = app.DistrKeeper.WithdrawDelegationRewards(ctx, delAddr, valAddr) // nolint: errcheck
 	}
 
@@ -115,14 +116,16 @@ func (app *LinkApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs [
 
 	// reinitialize all delegations
 	for _, del := range dels {
-		valAddr, err := sdk.ValAddressFromBech32(del.ValidatorAddress)
+		err := sdk.ValidateValAddress(del.ValidatorAddress)
 		if err != nil {
 			panic(err)
 		}
-		delAddr, err := sdk.AccAddressFromBech32(del.DelegatorAddress)
+		valAddr := sdk.ValAddress(del.ValidatorAddress)
+		err = sdk.ValidateAccAddress(del.DelegatorAddress)
 		if err != nil {
 			panic(err)
 		}
+		delAddr := sdk.AccAddress(del.DelegatorAddress)
 		app.DistrKeeper.Hooks().BeforeDelegationCreated(ctx, delAddr, valAddr)
 		app.DistrKeeper.Hooks().AfterDelegationModified(ctx, delAddr, valAddr)
 	}
