@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/line/lfb-sdk/store/cache"
+	"github.com/line/lbm-sdk/store/cache"
 	link "github.com/line/lfb/app"
 
 	"github.com/line/lfb/app/helpers"
@@ -15,11 +15,11 @@ import (
 	"github.com/line/tm-db/v2/memdb"
 	"github.com/stretchr/testify/require"
 
-	"github.com/line/lfb-sdk/baseapp"
-	"github.com/line/lfb-sdk/simapp"
-	"github.com/line/lfb-sdk/store"
-	simulation2 "github.com/line/lfb-sdk/types/simulation"
-	"github.com/line/lfb-sdk/x/simulation"
+	"github.com/line/lbm-sdk/baseapp"
+	"github.com/line/lbm-sdk/simapp"
+	"github.com/line/lbm-sdk/store"
+	simulation2 "github.com/line/lbm-sdk/types/simulation"
+	"github.com/line/lbm-sdk/x/simulation"
 )
 
 func init() {
@@ -27,7 +27,7 @@ func init() {
 }
 
 // Profile with:
-// /usr/local/go/bin/go test -benchmem -run=^$ github.com/line/lfb-sdk/LinkApp -bench ^BenchmarkFullAppSimulation$ -Commit=true -cpuprofile cpu.out
+// /usr/local/go/bin/go test -benchmem -run=^$ github.com/line/lbm-sdk/LinkApp -bench ^BenchmarkFullAppSimulation$ -Commit=true -cpuprofile cpu.out
 func BenchmarkFullAppSimulation(b *testing.B) {
 	config, db, dir, logger, _, err := simapp.SetupSimulation("goleveldb-app-sim", "Simulation")
 	if err != nil {

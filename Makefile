@@ -11,7 +11,7 @@ endif
 
 PACKAGES_SIMTEST=$(shell go list ./... | grep '/simulation')
 LEDGER_ENABLED ?= false
-SDK_PACK := $(shell go list -m github.com/line/lfb-sdk | sed  's/ /\@/g')
+SDK_PACK := $(shell go list -m github.com/line/lbm-sdk | sed  's/ /\@/g')
 OST_VERSION := $(shell go list -m github.com/line/ostracon | sed 's:.* ::') # grab everything after the space in "github.com/line/ostracon v0.34.7"
 DOCKER := $(shell which docker)
 BUILDDIR ?= $(CURDIR)/build
@@ -93,12 +93,12 @@ build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
 
 # process linker flags
 
-ldflags = -X github.com/line/lfb-sdk/version.Name=lfb \
-		  -X github.com/line/lfb-sdk/version.AppName=lfb \
-		  -X github.com/line/lfb-sdk/version.Version=$(VERSION) \
-		  -X github.com/line/lfb-sdk/version.Commit=$(COMMIT) \
-		  -X github.com/line/lfb-sdk/types.DBBackend=$(DB_BACKEND) \
-		  -X "github.com/line/lfb-sdk/version.BuildTags=$(build_tags_comma_sep)" \
+ldflags = -X github.com/line/lbm-sdk/version.Name=lfb \
+		  -X github.com/line/lbm-sdk/version.AppName=lfb \
+		  -X github.com/line/lbm-sdk/version.Version=$(VERSION) \
+		  -X github.com/line/lbm-sdk/version.Commit=$(COMMIT) \
+		  -X github.com/line/lbm-sdk/types.DBBackend=$(DB_BACKEND) \
+		  -X "github.com/line/lbm-sdk/version.BuildTags=$(build_tags_comma_sep)" \
 		  -X github.com/line/ostracon/version.TMCoreSemVer=$(OST_VERSION)
 
 ifeq (,$(findstring nostrip,$(LFB_BUILD_OPTIONS)))
@@ -281,7 +281,7 @@ lint:
 format:
 	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./client/lcd/statik/statik.go" | xargs gofmt -w -s
 	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./client/lcd/statik/statik.go" | xargs misspell -w
-	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./client/lcd/statik/statik.go" | xargs goimports -w -local github.com/line/lfb-sdk
+	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./client/lcd/statik/statik.go" | xargs goimports -w -local github.com/line/lbm-sdk
 
 ###############################################################################
 ###                                Localnet                                 ###

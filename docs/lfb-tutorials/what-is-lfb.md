@@ -4,11 +4,11 @@ order: 1
 
 # What is lfb?
 
-`lfb` is the name of the LFB SDK application for a LINE Financial Blockchain. It comes with 2 main entrypoints:
+`lfb` is the name of the LBM SDK application for a LINE Financial Blockchain. It comes with 2 main entrypoints:
 
 - `lfb`: The LFB Daemon and command-line interface (CLI). runs a full-node of the `lfb` application.
 
-`lfb` is built on the LFB SDK using the following modules:
+`lfb` is built on the LBM SDK using the following modules:
 
 - `x/auth`: Accounts and signatures.
 - `x/bank`: Token transfers.

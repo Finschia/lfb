@@ -7,8 +7,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	cryptocodec "github.com/line/lfb-sdk/crypto/codec"
-	sdk "github.com/line/lfb-sdk/types"
+	cryptocodec "github.com/line/lbm-sdk/crypto/codec"
+	sdk "github.com/line/lbm-sdk/types"
 
 	"github.com/line/ostracon/privval"
 )
