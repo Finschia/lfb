@@ -111,7 +111,7 @@ func TestMultiValidatorAddNodeAndPromoteValidator(t *testing.T) {
 	}
 
 	barAddr := f2.KeyAddress(keyBar)
-	barVal := sdk.ValAddress(barAddr)
+	barVal := barAddr.ToValAddress()
 
 	sendTokens := sdk.TokensFromConsensusPower(10)
 	{
