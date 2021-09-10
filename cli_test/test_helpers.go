@@ -479,9 +479,9 @@ func (f *Fixtures) KeysShow(name string, flags ...string) keyring.KeyOutput {
 // KeyAddress returns the SDK account address from the key
 func (f *Fixtures) KeyAddress(name string) sdk.AccAddress {
 	ko := f.KeysShow(name)
-	accAddr, err := sdk.AccAddressFromBech32(ko.Address)
+	err := sdk.ValidateAccAddress(ko.Address)
 	require.NoError(f.T, err)
-	return accAddr
+	return sdk.AccAddress(ko.Address)
 }
 
 // ___________________________________________________________________________________
@@ -1374,7 +1374,7 @@ func newValidator(f *Fixtures, cfg testnet.Config, appCfg *srvconfig.Config, ctx
 	logger := log.NewNopLogger()
 	var err error
 	if cfg.EnableLogging {
-		logger = log.NewTMLogger(log.NewSyncWriter(os.Stdout))
+		logger = log.NewOCLogger(log.NewSyncWriter(os.Stdout))
 		logger, err = ostflags.ParseLogLevel("info", logger, ostcfg.DefaultLogLevel)
 		require.NoError(f.T, err)
 	}

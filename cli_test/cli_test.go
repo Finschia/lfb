@@ -339,7 +339,7 @@ func TestLFBCreateValidator(t *testing.T) {
 	defer n.Cleanup()
 
 	barAddr := f.KeyAddress(keyBar)
-	barVal := sdk.ValAddress(barAddr)
+	barVal := barAddr.ToValAddress()
 
 	consPubKey := sdk.MustBech32ifyPubKey(sdk.Bech32PubKeyTypeConsPub, ed25519.GenPrivKey().PubKey())
 

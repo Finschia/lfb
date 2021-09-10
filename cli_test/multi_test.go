@@ -111,7 +111,7 @@ func TestMultiValidatorAddNodeAndPromoteValidator(t *testing.T) {
 	}
 
 	barAddr := f2.KeyAddress(keyBar)
-	barVal := sdk.ValAddress(barAddr)
+	barVal := barAddr.ToValAddress()
 
 	sendTokens := sdk.TokensFromConsensusPower(10)
 	{
@@ -129,7 +129,7 @@ func TestMultiValidatorAddNodeAndPromoteValidator(t *testing.T) {
 		pubkey, err := privVal.GetPubKey()
 		require.NoError(t, err)
 
-		tmValPubKey, err := cryptocodec.FromTmPubKeyInterface(pubkey)
+		tmValPubKey, err := cryptocodec.FromOcPubKeyInterface(pubkey)
 		require.NoError(t, err)
 		consPubKey := sdk.MustBech32ifyPubKey(sdk.Bech32PubKeyTypeConsPub, tmValPubKey)
 
