@@ -92,6 +92,6 @@ Build tags indicate special features that have been enabled in the binary.
 To test any changes made in the SDK or Ostracon, a `replace` clause needs to be added to `go.mod` providing the correct import path.
 
 - Make appropriate changes
-- Add `replace github.com/line/lfb-sdk => /path/to/clone/lfb-sdk` to `go.mod`
+- Add `replace github.com/line/lbm-sdk => /path/to/clone/lbm-sdk` to `go.mod`
 - Run `make clean install` or `make clean build`
 - Test changes

@@ -429,8 +429,8 @@ github.com/line/gorocksdb v0.0.0-20210406043732-d4bea34b6d55 h1:cXVtMiJkvQ4kn0px
 github.com/line/gorocksdb v0.0.0-20210406043732-d4bea34b6d55/go.mod h1:DHRJroSL7NaRkpvocRx3OtRsleXVsYSxBI9SfHFlTQ0=
 github.com/line/iavl/v2 v2.0.0-init.1.0.20210602045707-fddfe1f85001 h1:c2URk0zxM1vRgaRfIFoWkLzvj17nl/To9Q3NUVwY4+g=
 github.com/line/iavl/v2 v2.0.0-init.1.0.20210602045707-fddfe1f85001/go.mod h1:0Xz+0i1nlB9lrjUDEwpDRhcmjfEAkOjd20dRb40FBso=
-github.com/line/lfb-sdk v1.0.0-init.1.0.20210910004202-84db942b6643 h1:wmhbhFbZDURazdQ2At+dbuZJ2afEUUmBJEL82/j0tP4=
-github.com/line/lfb-sdk v1.0.0-init.1.0.20210910004202-84db942b6643/go.mod h1:8ZnJ/Aw3dt+p0Vv6Wg0KjYK6LkPEV0+gfbAZmoEz7qg=
+github.com/line/lbm-sdk v1.0.0-init.1.0.20210910074019-a18b7c8c01a7 h1:8iFN1EUl5XU3tvj7IYNll7nHHxQL/7p0jmRhvOl/CJg=
+github.com/line/lbm-sdk v1.0.0-init.1.0.20210910074019-a18b7c8c01a7/go.mod h1:HCrChL73GZ7mt2OkDtzgg8vvmyh3ZntsgJlIHoBAH3A=
 github.com/line/ostracon v0.34.9-0.20210429084710-ef4fe0a40c7d/go.mod h1:ttnbq+yQJMQ9a2MT5SEisOoa/+pOgh2KenTiK/rVdiw=
 github.com/line/ostracon v0.34.9-0.20210906083237-658e85d9b160 h1:lA/c9x9KpcUrQ9lR7itFe1CO0k544nwdCW5gCaPWWWw=
 github.com/line/ostracon v0.34.9-0.20210906083237-658e85d9b160/go.mod h1:elTiUFLvBz6Yaze+ZZLlbUnhqKWLJ7cMy/P9rSabafQ=

@@ -15,11 +15,11 @@ builds:
     - -mod=readonly
     - -tags=netgo ledger
   ldflags:
-    - -X github.com/line/lfb-sdk/version.Name=lfb
-    - -X github.com/line/lfb-sdk/version.ServerName=lfb
-    - -X github.com/line/lfb-sdk/version.Version={{ .Version }}
-    - -X github.com/line/lfb-sdk/version.Commit={{ .FullCommit }}
-    - -X "github.com/line/lfb-sdk/version.BuildTags=netgo,ledger"
+    - -X github.com/line/lbm-sdk/version.Name=lfb
+    - -X github.com/line/lbm-sdk/version.ServerName=lfb
+    - -X github.com/line/lbm-sdk/version.Version={{ .Version }}
+    - -X github.com/line/lbm-sdk/version.Commit={{ .FullCommit }}
+    - -X "github.com/line/lbm-sdk/version.BuildTags=netgo,ledger"
 archives:
 -
   builds: ['lfb']

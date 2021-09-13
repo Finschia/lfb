@@ -2,7 +2,7 @@
 
 [![codecov](https://codecov.io/gh/line/lfb/branch/main/graph/badge.svg?token=JFFuUevpzJ)](https://codecov.io/gh/line/lfb)
 
-This repository hosts `LFB(LINE Financial Blockchain)`. This repository is forked from [gaia](https://github.com/cosmos/gaia) at 2021-03-15. LFB is a mainnet app implementation using [lfb-sdk](https://github.com/line/lfb-sdk) and [ostracon](https://github.com/line/ostracon).
+This repository hosts `LFB(LINE Financial Blockchain)`. This repository is forked from [gaia](https://github.com/cosmos/gaia) at 2021-03-15. LFB is a mainnet app implementation using [lbm-sdk](https://github.com/line/lbm-sdk) and [ostracon](https://github.com/line/ostracon).
 
 **Node**: Requires [Go 1.15+](https://golang.org/dl/)
 

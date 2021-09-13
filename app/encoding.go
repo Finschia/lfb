@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/line/lfb-sdk/std"
+	"github.com/line/lbm-sdk/std"
 	"github.com/line/lfb/app/params"
 )
 
