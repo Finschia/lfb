@@ -24,16 +24,24 @@ COPY ./go.sum /lfb-build/lfb/go.sum
 RUN go mod download
 
 # Build cosmwasm
+ENV RUSTUP_HOME=/usr/local/rustup
+ENV CARGO_HOME=/usr/local/cargo
+ENV PATH=$CARGO_HOME/bin:$PATH
+
+RUN wget "https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-musl/rustup-init"
+RUN chmod +x rustup-init
+RUN ./rustup-init -y --no-modify-path --default-toolchain 1.53.0; rm rustup-init
+RUN chmod -R a+w $RUSTUP_HOME $CARGO_HOME
 RUN cd $(go list -f "{{ .Dir }}" -m github.com/line/wasmvm) && \
-    RUSTFLAGS='-C target-feature=-crt-static' cargo build --release --example muslc && \
-    mv target/release/examples/libmuslc.a /usr/lib/libwasmvm_muslc.a && \
+    RUSTFLAGS='-C target-feature=-crt-static' cargo build --release --example staticlib && \
+    mv -f target/release/examples/libstaticlib.a /usr/lib/libwasmvm_static.a && \
     rm -rf target
 
 # Add source files
 COPY . .
 
 # Make install
-RUN BUILD_TAGS=muslc make install CGO_ENABLED=1 LFB_BUILD_OPTIONS="$LFB_BUILD_OPTIONS"
+RUN BUILD_TAGS=static make install CGO_ENABLED=1 LFB_BUILD_OPTIONS="$LFB_BUILD_OPTIONS"
 
 # Final image
 FROM alpine:edge

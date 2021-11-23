@@ -131,6 +131,10 @@ build: BUILD_ARGS=-o $(BUILDDIR)/
 build: go.sum $(BUILDDIR)/ dbbackend
 	CGO_CFLAGS=$(CGO_CFLAGS) CGO_LDFLAGS=$(CGO_LDFLAGS) CGO_ENABLED=$(CGO_ENABLED) go build -mod=readonly $(BUILD_FLAGS) $(BUILD_ARGS) ./...
 
+build-static: go.sum $(BUILDDIR)/
+	docker build -t line/lfb-builder:static -f builders/Dockerfile.static .
+	docker run -it --rm -v $(shell pwd):/code -e LFB_BUILD_OPTIONS="$(LFB_BUILD_OPTIONS)" line/lfb-builder:static
+
 install: go.sum $(BUILDDIR)/ dbbackend
 	CGO_CFLAGS=$(CGO_CFLAGS) CGO_LDFLAGS=$(CGO_LDFLAGS) CGO_ENABLED=$(CGO_ENABLED) go install $(BUILD_FLAGS) $(BUILD_ARGS) ./cmd/lfb
 
@@ -183,9 +187,6 @@ build-reproducible: go.sum
         --env LEDGER_ENABLED=$(LEDGER_ENABLED) \
         --name latest-build cosmossdk/rbuilder:latest
 	$(DOCKER) cp -a latest-build:/home/builder/artifacts/ $(CURDIR)/
-
-build-linux: go.sum
-	LEDGER_ENABLED=false GOOS=linux GOARCH=amd64 $(MAKE) build
 
 build-docker:
 	docker build --build-arg LFB_BUILD_OPTIONS="$(LFB_BUILD_OPTIONS)" -t line/lfb .
@@ -291,7 +292,7 @@ build-docker-lfbnode:
 	$(MAKE) -C networks/local
 
 # Run a 4-node testnet locally
-localnet-start: build-linux localnet-stop
+localnet-start: build-docker-lfbnode build-static localnet-stop
 	@if ! [ -f build/node0/lfb/config/genesis.json ]; then docker run --rm -v $(CURDIR)/build:/lfb:Z line/lfbnode testnet --v 4 -o . --starting-ip-address 192.168.10.2 --keyring-backend=test ; fi
 	docker-compose up -d
 
@@ -309,7 +310,7 @@ test-docker-push: test-docker
 	@docker push ${TEST_DOCKER_REPO}:$(shell git rev-parse --abbrev-ref HEAD | sed 's#/#_#g')
 	@docker push ${TEST_DOCKER_REPO}:latest
 
-.PHONY: all build-linux install format lint \
+.PHONY: all install format lint \
 	go-mod-cache draw-deps clean build \
 	setup-transactions setup-contract-tests-data start-link run-lcd-contract-tests contract-tests \
 	test test-all test-build test-cover test-unit test-race \
