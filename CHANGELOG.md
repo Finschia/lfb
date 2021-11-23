@@ -43,6 +43,7 @@ Ref: https://keepachangelog.com/en/1.0.0/
 * (sdk) Use fastcache for inter block cache and iavl cache
 * (sdk) Enable signature verification cache
 * (ostracon) Apply asynchronous receiving reactor
+* (sdk) [\#29](https://github.com/line/lfb/pull/29) Use lbm-sdk v0.43.1
 
 ### Bug Fixes
 

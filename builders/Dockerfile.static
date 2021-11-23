@@ -1,0 +1,29 @@
+# make image
+# > docker build -t line/lfb-builder:static -f builders/Dockerfile.static .
+#
+# run build
+# > docker run -it --rm -v $(pwd):/code line/lfb-builder:static
+#
+# make image and run build
+# > docker run -it --rm -v $(pwd):/code -e LFB_BUILD_OPTIONS=rocksdb $(docker build -f builders/Dockerfile.static -q .)
+
+FROM rust:1.53
+
+ENV LFB_BUILD_OPTIONS="goleveldb"
+
+# install tools
+RUN apt update && apt install -y cmake
+
+# install go
+WORKDIR /tmp
+ADD https://golang.org/dl/go1.15.15.linux-amd64.tar.gz .
+RUN tar -C /usr/local -xzf go1.15.15.linux-amd64.tar.gz
+ENV PATH=/usr/local/go/bin:$PATH
+
+WORKDIR /code
+
+# copy build script
+COPY builders/scripts/build-static.sh builders/scripts/build-static.sh
+
+# build lfb
+ENTRYPOINT builders/scripts/build-static.sh
